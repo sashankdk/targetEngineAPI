@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"os"
 
-	"targetApi/internal/delivery"
-	"targetApi/internal/transport"
 	"targetApi/internal/db"
+	"targetApi/internal/delivery"
 	"targetApi/internal/listener"
+	"targetApi/internal/transport"
 )
 
 func main() {

@@ -6,12 +6,11 @@ import (
 	"time"
 
 	"targetApi/internal/db"
-	"targetApi/internal/repository"
 
 	"github.com/lib/pq"
 )
 
-func ListenForCampaignChanges(dbConn string, repo repository.Repository, cache *db.Cache) {
+func ListenForCampaignChanges(dbConn string, repo *db.PgRepo, cache *db.Cache) {
 	listener := pq.NewListener(dbConn, 1*time.Second, 10*time.Second, nil)
 
 	if err := listener.Listen("campaign_change"); err != nil {

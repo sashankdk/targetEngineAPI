@@ -3,18 +3,17 @@ package db
 import (
 	"database/sql"
 	"targetApi/internal/model"
-	"targetApi/internal/repository"
 )
 
-type pgRepo struct {
+type PgRepo struct {
 	db *sql.DB
 }
 
-func NewPostgresRepo(db *sql.DB) repository.Repository {
-	return &pgRepo{db: db}
+func NewPostgresRepo(db *sql.DB) *PgRepo {
+	return &PgRepo{db: db}
 }
 
-func (r *pgRepo) GetActiveCampaigns() ([]model.Campaign, error) {
+func (r *PgRepo) GetActiveCampaigns() ([]model.Campaign, error) {
 	rows, err := r.db.Query(`SELECT id, img, cta FROM campaigns WHERE status = 'ACTIVE'`)
 	if err != nil {
 		return nil, err
@@ -32,7 +31,7 @@ func (r *pgRepo) GetActiveCampaigns() ([]model.Campaign, error) {
 	return result, nil
 }
 
-func (r *pgRepo) GetTargetingRules() (map[string]model.TargetingRule, error) {
+func (r *PgRepo) GetTargetingRules() (map[string]model.TargetingRule, error) {
 	rows, err := r.db.Query(`
 		SELECT campaign_id, include_app, exclude_app, include_os, exclude_os, include_country, exclude_country
 		FROM targeting_rules`)

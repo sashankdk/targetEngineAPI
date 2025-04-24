@@ -23,6 +23,7 @@ services:
     build:
       context: .
       dockerfile: docker/testDockerfile
+    container_name: testApi
     depends_on:
       - postgres
       - redis
