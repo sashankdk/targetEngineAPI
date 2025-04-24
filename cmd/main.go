@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -12,6 +11,12 @@ import (
 	"targetApi/internal/delivery"
 	"targetApi/internal/listener"
 	"targetApi/internal/transport"
+
+	"github.com/go-kit/log"
+	"github.com/sony/gobreaker"
+	"golang.org/x/time/rate"
+
+	"targetApi/internal/middleware"
 )
 
 func main() {
@@ -30,7 +35,7 @@ func main() {
 	)
 	pg, err := sql.Open("postgres", postgresConnection)
 	if err != nil {
-		log.Fatalf("Postgres connection failed: %v", err)
+		fmt.Printf("Postgres connection failed: %v", err)
 	}
 
 	// use the connection pool + redis cache
@@ -46,10 +51,16 @@ func main() {
 	// Listen for changes in the database
 	go listener.ListenForCampaignChanges(postgresConnection, repo, cache)
 
-	// Initialize the repository
+	// Initialize the service and HTTP handler
+	logger := log.NewJSONLogger(os.Stdout)
 	svc := delivery.NewService(cache)
-	handler := transport.NewHTTPHandler(svc)
+	svc = middleware.LoggingMiddleware(logger)(svc)
+	svc = middleware.CircuitBreakerMiddleware(gobreaker.NewCircuitBreaker(gobreaker.Settings{Name: "GetCampaigns"}))(svc)
+	rateLimiter := rate.NewLimiter(10, 20) // 10 req/sec, burst of 20
+	handler := middleware.RecoveryMiddleware(
+		middleware.RateLimiterMiddleware(rateLimiter)(
+			transport.NewHTTPHandler(svc)))
 
-	log.Printf("api listening on :%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, handler))
+	fmt.Printf("api listening on :%s \n", port)
+	fmt.Println(http.ListenAndServe(":"+port, handler))
 }

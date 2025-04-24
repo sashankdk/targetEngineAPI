@@ -2,7 +2,6 @@ package delivery
 
 import (
 	"context"
-	"errors"
 	"targetApi/internal/db"
 	"targetApi/internal/model"
 )
@@ -18,10 +17,6 @@ type deliveryStruct struct {
 func NewService(cache *db.Cache) DeliveryService {
 	return &deliveryStruct{cache: cache}
 }
-
-var ErrAppId = errors.New("appId is required")
-var ErrCountry = errors.New("country is required")
-var ErrOs = errors.New("os is required")
 
 func (d *deliveryStruct) GetCampaigns(appId, country, os string) ([]model.Campaign, error) {
 
