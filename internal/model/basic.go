@@ -1,5 +1,9 @@
 package model
 
+import (
+	"github.com/lib/pq"
+)
+
 type Campaign struct {
 	ID  string `json:"cid"`
 	Img string `json:"img"`
@@ -8,10 +12,10 @@ type Campaign struct {
 
 type TargetingRule struct {
 	CampaignID     string
-	IncludeApp     []string
-	ExcludeApp     []string
-	IncludeOS      []string
-	ExcludeOS      []string
-	IncludeCountry []string
-	ExcludeCountry []string
+	IncludeApp     pq.StringArray
+	ExcludeApp     pq.StringArray
+	IncludeOS      pq.StringArray
+	ExcludeOS      pq.StringArray
+	IncludeCountry pq.StringArray
+	ExcludeCountry pq.StringArray
 }

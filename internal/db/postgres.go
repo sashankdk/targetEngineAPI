@@ -33,7 +33,7 @@ func (r *PgRepo) GetActiveCampaigns() ([]model.Campaign, error) {
 
 func (r *PgRepo) GetTargetingRules() (map[string]model.TargetingRule, error) {
 	rows, err := r.db.Query(`
-		SELECT campaign_id, include_app, exclude_app, include_os, exclude_os, include_country, exclude_country
+		SELECT campaign_id, COALESCE(include_app, '{}'::text[]), COALESCE(exclude_app, '{}'::text[]), COALESCE(include_os, '{}'::text[]), COALESCE(exclude_os, '{}'::text[]), COALESCE(include_country, '{}'::text[]), COALESCE(exclude_country, '{}'::text[])
 		FROM targeting_rules`)
 	if err != nil {
 		return nil, err

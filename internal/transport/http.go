@@ -33,8 +33,18 @@ func decodeGetDeliveryRequest(_ context.Context, r *http.Request) (interface{}, 
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	if res, ok := response.(delivery.GetdeliveryResponse); ok && res.Err != "" {
+	res := response.(delivery.GetdeliveryResponse)
+
+	if res.Err != "" {
 		w.WriteHeader(http.StatusBadRequest)
+		return json.NewEncoder(w).Encode(map[string]string{"error": res.Err})
 	}
-	return json.NewEncoder(w).Encode(response)
+
+	if len(res.Campaigns) == 0 {
+		w.WriteHeader(http.StatusNoContent)
+		return nil
+	}
+
+	w.WriteHeader(http.StatusOK)
+	return json.NewEncoder(w).Encode(res.Campaigns)
 }

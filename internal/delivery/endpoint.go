@@ -14,13 +14,17 @@ type GetdeliveryRequest struct {
 }
 
 type GetdeliveryResponse struct {
-	Campaigns []model.Campaign `json:"campaigns,omitempty"`
-	Err       string           `json:"err,omitempty"`
+	Campaigns []model.Campaign `json:"-"`
+	Err       string           `json:"error,omitempty"`
 }
 
 func GetdeliveryEndpoint(svc DeliveryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetdeliveryRequest)
+
+		if req.AppId == "" || req.Country == "" || req.Os == "" {
+			return GetdeliveryResponse{Err: "missing app/country/os param"}, nil
+		}
 		campaigns, err := svc.GetCampaigns(req.AppId, req.Country, req.Os)
 		if err != nil {
 			return GetdeliveryResponse{Err: err.Error()}, nil

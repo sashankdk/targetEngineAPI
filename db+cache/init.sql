@@ -28,6 +28,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS campaign_update_trigger ON campaigns;
+
 CREATE TRIGGER campaign_update_trigger
 AFTER INSERT OR UPDATE OR DELETE ON campaigns
 FOR EACH ROW EXECUTE FUNCTION notify_campaign_change();
@@ -36,10 +38,12 @@ FOR EACH ROW EXECUTE FUNCTION notify_campaign_change();
 CREATE OR REPLACE FUNCTION notify_targeting_rule_change()
 RETURNS trigger AS $$
 BEGIN
-  PERFORM pg_notify('targeting_rule_change', NEW.campaign_id);
+  PERFORM pg_notify('targeting_rule_change', COALESCE(NEW.campaign_id, OLD.campaign_id));
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS targeting_rule_update_trigger ON targeting_rules;
 
 CREATE TRIGGER targeting_rule_update_trigger
 AFTER INSERT OR UPDATE OR DELETE ON targeting_rules

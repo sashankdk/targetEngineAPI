@@ -25,23 +25,11 @@ var ErrOs = errors.New("os is required")
 
 func (d *deliveryStruct) GetCampaigns(appId, country, os string) ([]model.Campaign, error) {
 
-	if appId == "" {
-		return nil, ErrAppId
-	}
-	if country == "" {
-		return nil, ErrCountry
-	}
-	if os == "" {
-		return nil, ErrOs
-	}
-
 	ctx := context.Background()
-
 	campaigns, err := d.cache.GetCampaigns(ctx)
 	if err != nil {
 		return nil, err
 	}
-
 	var result []model.Campaign
 	for _, c := range campaigns {
 		rule, err := d.cache.GetRule(ctx, c.ID)
