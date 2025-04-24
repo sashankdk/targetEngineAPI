@@ -4,10 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"targetApi/internal/delivery"
 
 	httptransport "github.com/go-kit/kit/transport/http"
-
-	"targetApi/internal/delivery"
 )
 
 func NewHTTPHandler(svc delivery.DeliveryService) http.Handler {
