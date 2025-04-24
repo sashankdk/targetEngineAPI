@@ -1,0 +1,10 @@
+FROM golang:1.21
+
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+# Run all tests in the project
+CMD ["go", "test", "./..."]

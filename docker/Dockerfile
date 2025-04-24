@@ -6,7 +6,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o targetApi ./cmd/service
+RUN CGO_ENABLED=0 GOOS=linux go build -o targetApi ./cmd/main.go
 
 # Stage 2: Run
 FROM alpine:latest

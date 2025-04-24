@@ -10,7 +10,7 @@ services:
       POSTGRES_DB: gg_campaigns
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db+cache/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
 
@@ -19,12 +19,26 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+  test:
+    build:
+      context: .
+      dockerfile: docker/testDockerfile
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: gg_user
+      POSTGRES_PASSWORD: gg_pass
+      POSTGRES_DB: gg_campaigns
+      REDIS_HOST: redis:6379
 
   api:
     build:
       context: .
-      dockerfile: docker/Dockerfile.api
-    container_name: targeting-api
+      dockerfile: docker/Dockerfile
+    container_name: targetApi
     depends_on:
       - postgres
       - redis
