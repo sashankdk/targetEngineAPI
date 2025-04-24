@@ -11,6 +11,7 @@ import (
 	"targetApi/internal/delivery"
 	"targetApi/internal/transport"
 	"targetApi/internal/db"
+	"targetApi/internal/listener"
 )
 
 func main() {
@@ -41,6 +42,10 @@ func main() {
 	ctx := context.Background()
 	cache.SetCampaigns(ctx, campaigns)
 	cache.SetRules(ctx, rules)
+
+	// Listen for changes in the database
+	go listener.ListenForCampaignChanges(postgresConnection, repo, cache)
+
 	// Initialize the repository
 	svc := delivery.NewService(cache)
 	handler := transport.NewHTTPHandler(svc)
